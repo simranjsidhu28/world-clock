@@ -44,9 +44,7 @@
         mix-blend-mode: overlay;
       }
 
-      .app {
-        width: min(980px, 100%);
-      }
+      .app { width: min(980px, 100%); }
 
       header {
         display: flex;
@@ -110,14 +108,15 @@
         min-width: 0;
       }
 
+      /* UPDATED: round, white icon background + black icon */
       .icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
         display: grid;
         place-items: center;
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: #ffffff;
+        border: none;
         flex: 0 0 auto;
       }
 
@@ -153,7 +152,6 @@
         color: var(--muted);
       }
 
-      /* Tiny “status dot” for a calm, polished touch */
       .dot {
         width: 10px;
         height: 10px;
@@ -168,7 +166,6 @@
         font-size: 12px;
       }
 
-      /* SVG icon color */
       svg { display: block; }
       .hand { transform-origin: 16px 16px; }
     </style>
@@ -179,7 +176,7 @@
       <header>
         <div>
           <h1>World Clock</h1>
-          <p class="subtitle">Pacific • India • Dublin <span style="opacity:.7">• v1</span></p>
+          <p class="subtitle">Pacific • India • Dublin</p>
         </div>
         <div class="dot" aria-hidden="true"></div>
       </header>
@@ -189,12 +186,11 @@
           <div class="row">
             <div class="place">
               <div class="icon" aria-hidden="true">
-                <!-- simple clock icon (inline SVG) -->
-                <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
-                  <circle cx="16" cy="16" r="12.5" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
-                  <path class="hand" id="hand-la-h" d="M16 16 L16 9" stroke="rgba(255,255,255,.85)" stroke-width="2.2" stroke-linecap="round"/>
-                  <path class="hand" id="hand-la-m" d="M16 16 L22 16" stroke="rgba(255,255,255,.75)" stroke-width="2.2" stroke-linecap="round"/>
-                  <circle cx="16" cy="16" r="1.6" fill="rgba(255,255,255,.85)"/>
+                <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                  <circle cx="16" cy="16" r="12.5" stroke="#000" stroke-width="2"/>
+                  <path class="hand" id="hand-la-h" d="M16 16 L16 9" stroke="#000" stroke-width="2.2" stroke-linecap="round"/>
+                  <path class="hand" id="hand-la-m" d="M16 16 L22 16" stroke="#000" stroke-width="2.2" stroke-linecap="round"/>
+                  <circle cx="16" cy="16" r="1.6" fill="#000"/>
                 </svg>
               </div>
               <div class="label">
@@ -211,11 +207,11 @@
           <div class="row">
             <div class="place">
               <div class="icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
-                  <circle cx="16" cy="16" r="12.5" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
-                  <path class="hand" id="hand-in-h" d="M16 16 L16 9" stroke="rgba(255,255,255,.85)" stroke-width="2.2" stroke-linecap="round"/>
-                  <path class="hand" id="hand-in-m" d="M16 16 L22 16" stroke="rgba(255,255,255,.75)" stroke-width="2.2" stroke-linecap="round"/>
-                  <circle cx="16" cy="16" r="1.6" fill="rgba(255,255,255,.85)"/>
+                <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                  <circle cx="16" cy="16" r="12.5" stroke="#000" stroke-width="2"/>
+                  <path class="hand" id="hand-in-h" d="M16 16 L16 9" stroke="#000" stroke-width="2.2" stroke-linecap="round"/>
+                  <path class="hand" id="hand-in-m" d="M16 16 L22 16" stroke="#000" stroke-width="2.2" stroke-linecap="round"/>
+                  <circle cx="16" cy="16" r="1.6" fill="#000"/>
                 </svg>
               </div>
               <div class="label">
@@ -232,11 +228,11 @@
           <div class="row">
             <div class="place">
               <div class="icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
-                  <circle cx="16" cy="16" r="12.5" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
-                  <path class="hand" id="hand-db-h" d="M16 16 L16 9" stroke="rgba(255,255,255,.85)" stroke-width="2.2" stroke-linecap="round"/>
-                  <path class="hand" id="hand-db-m" d="M16 16 L22 16" stroke="rgba(255,255,255,.75)" stroke-width="2.2" stroke-linecap="round"/>
-                  <circle cx="16" cy="16" r="1.6" fill="rgba(255,255,255,.85)"/>
+                <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+                  <circle cx="16" cy="16" r="12.5" stroke="#000" stroke-width="2"/>
+                  <path class="hand" id="hand-db-h" d="M16 16 L16 9" stroke="#000" stroke-width="2.2" stroke-linecap="round"/>
+                  <path class="hand" id="hand-db-m" d="M16 16 L22 16" stroke="#000" stroke-width="2.2" stroke-linecap="round"/>
+                  <circle cx="16" cy="16" r="1.6" fill="#000"/>
                 </svg>
               </div>
               <div class="label">
@@ -281,7 +277,6 @@
           day: "2-digit",
         });
 
-      // For the little clock hands: rotate based on that zone's time
       const partsToObj = (parts) => Object.fromEntries(parts.map(p => [p.type, p.value]));
 
       function renderOne(key, zone) {
@@ -290,7 +285,6 @@
         document.getElementById(`time-${key}`).textContent = timeFmt(zone).format(now);
         document.getElementById(`date-${key}`).textContent = dateFmt(zone).format(now);
 
-        // Animate icon hands
         const parts = partsToObj(
           new Intl.DateTimeFormat("en-US", {
             timeZone: zone,
@@ -305,8 +299,8 @@
         const m = Number(parts.minute);
         const s = Number(parts.second);
 
-        const hourAngle = ((h % 12) + m / 60) * 30;   // 360/12
-        const minAngle = (m + s / 60) * 6;            // 360/60
+        const hourAngle = ((h % 12) + m / 60) * 30;
+        const minAngle = (m + s / 60) * 6;
 
         const handH = document.getElementById(`hand-${key}-h`);
         const handM = document.getElementById(`hand-${key}-m`);
