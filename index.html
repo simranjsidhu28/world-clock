@@ -4,50 +4,320 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>World Clock</title>
+
     <style>
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; padding: 24px; }
-      .grid { display: grid; gap: 12px; max-width: 520px; }
-      .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; }
-      .label { color: #555; font-size: 14px; }
-      .time { font-size: 28px; font-weight: 650; margin-top: 6px; }
+      :root {
+        --card-bg: rgba(255, 255, 255, 0.14);
+        --card-border: rgba(255, 255, 255, 0.22);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.72);
+        --shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        color: var(--text);
+        display: grid;
+        place-items: center;
+        padding: 28px;
+
+        /* Peaceful “wallpaper” background: aurora + soft glow + subtle grain */
+        background:
+          radial-gradient(900px 550px at 15% 20%, rgba(130, 220, 255, 0.30), transparent 60%),
+          radial-gradient(900px 550px at 85% 25%, rgba(185, 140, 255, 0.26), transparent 60%),
+          radial-gradient(900px 650px at 55% 85%, rgba(120, 255, 200, 0.18), transparent 60%),
+          linear-gradient(135deg, #0b132b, #121b3a 45%, #0b2a36);
+      }
+
+      /* Subtle grain for “wallpaper” feel */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.10;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+        mix-blend-mode: overlay;
+      }
+
+      .app {
+        width: min(980px, 100%);
+      }
+
+      header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(26px, 4vw, 38px);
+        letter-spacing: 0.3px;
+      }
+
+      .subtitle {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+
+      @media (max-width: 900px) {
+        .grid { grid-template-columns: 1fr; }
+      }
+
+      .card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 18px;
+        padding: 16px 16px 14px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+        transition: transform 180ms ease, border-color 180ms ease;
+      }
+
+      .card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(255, 255, 255, 0.35);
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .place {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        flex: 0 0 auto;
+      }
+
+      .label {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+      }
+
+      .city {
+        font-size: 15px;
+        font-weight: 650;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .tz {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .time {
+        margin-top: 12px;
+        font-size: 30px;
+        font-weight: 750;
+        letter-spacing: 0.4px;
+      }
+
+      .date {
+        margin-top: 6px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      /* Tiny “status dot” for a calm, polished touch */
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.65);
+        box-shadow: 0 0 18px rgba(255, 255, 255, 0.35);
+      }
+
+      footer {
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      /* SVG icon color */
+      svg { display: block; }
+      .hand { transform-origin: 16px 16px; }
     </style>
   </head>
+
   <body>
-    <h1>World Clock</h1>
-    <div class="grid">
-      <div class="card">
-        <div class="label">Pacific (Los Angeles)</div>
-        <div class="time" id="la"></div>
-      </div>
-      <div class="card">
-        <div class="label">India (Kolkata)</div>
-        <div class="time" id="in"></div>
-      </div>
-      <div class="card">
-        <div class="label">Dublin, Ireland</div>
-        <div class="time" id="db"></div>
-      </div>
-    </div>
+    <main class="app">
+      <header>
+        <div>
+          <h1>World Clock</h1>
+          <p class="subtitle">Pacific • India • Dublin</p>
+        </div>
+        <div class="dot" aria-hidden="true"></div>
+      </header>
+
+      <section class="grid">
+        <article class="card">
+          <div class="row">
+            <div class="place">
+              <div class="icon" aria-hidden="true">
+                <!-- simple clock icon (inline SVG) -->
+                <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="12.5" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
+                  <path class="hand" id="hand-la-h" d="M16 16 L16 9" stroke="rgba(255,255,255,.85)" stroke-width="2.2" stroke-linecap="round"/>
+                  <path class="hand" id="hand-la-m" d="M16 16 L22 16" stroke="rgba(255,255,255,.75)" stroke-width="2.2" stroke-linecap="round"/>
+                  <circle cx="16" cy="16" r="1.6" fill="rgba(255,255,255,.85)"/>
+                </svg>
+              </div>
+              <div class="label">
+                <div class="city">Pacific (Los Angeles)</div>
+                <div class="tz" id="tz-la">America/Los_Angeles</div>
+              </div>
+            </div>
+          </div>
+          <div class="time" id="time-la"></div>
+          <div class="date" id="date-la"></div>
+        </article>
+
+        <article class="card">
+          <div class="row">
+            <div class="place">
+              <div class="icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="12.5" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
+                  <path class="hand" id="hand-in-h" d="M16 16 L16 9" stroke="rgba(255,255,255,.85)" stroke-width="2.2" stroke-linecap="round"/>
+                  <path class="hand" id="hand-in-m" d="M16 16 L22 16" stroke="rgba(255,255,255,.75)" stroke-width="2.2" stroke-linecap="round"/>
+                  <circle cx="16" cy="16" r="1.6" fill="rgba(255,255,255,.85)"/>
+                </svg>
+              </div>
+              <div class="label">
+                <div class="city">India (Kolkata)</div>
+                <div class="tz" id="tz-in">Asia/Kolkata</div>
+              </div>
+            </div>
+          </div>
+          <div class="time" id="time-in"></div>
+          <div class="date" id="date-in"></div>
+        </article>
+
+        <article class="card">
+          <div class="row">
+            <div class="place">
+              <div class="icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="12.5" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
+                  <path class="hand" id="hand-db-h" d="M16 16 L16 9" stroke="rgba(255,255,255,.85)" stroke-width="2.2" stroke-linecap="round"/>
+                  <path class="hand" id="hand-db-m" d="M16 16 L22 16" stroke="rgba(255,255,255,.75)" stroke-width="2.2" stroke-linecap="round"/>
+                  <circle cx="16" cy="16" r="1.6" fill="rgba(255,255,255,.85)"/>
+                </svg>
+              </div>
+              <div class="label">
+                <div class="city">Dublin, Ireland</div>
+                <div class="tz" id="tz-db">Europe/Dublin</div>
+              </div>
+            </div>
+          </div>
+          <div class="time" id="time-db"></div>
+          <div class="date" id="date-db"></div>
+        </article>
+      </section>
+
+      <footer>
+        Tip: Pacific and Dublin automatically adjust for daylight saving time.
+      </footer>
+    </main>
 
     <script>
-      const formatTime = (timeZone) =>
+      const ZONES = {
+        la: "America/Los_Angeles",
+        in: "Asia/Kolkata",
+        db: "Europe/Dublin",
+      };
+
+      const timeFmt = (timeZone) =>
         new Intl.DateTimeFormat(undefined, {
           timeZone,
-          weekday: "short",
-          year: "numeric",
-          month: "short",
-          day: "2-digit",
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
           hour12: true,
           timeZoneName: "short",
-        }).format(new Date());
+        });
+
+      const dateFmt = (timeZone) =>
+        new Intl.DateTimeFormat(undefined, {
+          timeZone,
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "2-digit",
+        });
+
+      // For the little clock hands: rotate based on that zone's time
+      const partsToObj = (parts) => Object.fromEntries(parts.map(p => [p.type, p.value]));
+
+      function renderOne(key, zone) {
+        const now = new Date();
+
+        document.getElementById(`time-${key}`).textContent = timeFmt(zone).format(now);
+        document.getElementById(`date-${key}`).textContent = dateFmt(zone).format(now);
+
+        // Animate icon hands
+        const parts = partsToObj(
+          new Intl.DateTimeFormat("en-US", {
+            timeZone: zone,
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+          }).formatToParts(now)
+        );
+
+        const h = Number(parts.hour);
+        const m = Number(parts.minute);
+        const s = Number(parts.second);
+
+        const hourAngle = ((h % 12) + m / 60) * 30;   // 360/12
+        const minAngle = (m + s / 60) * 6;            // 360/60
+
+        const handH = document.getElementById(`hand-${key}-h`);
+        const handM = document.getElementById(`hand-${key}-m`);
+        if (handH) handH.style.transform = `rotate(${hourAngle}deg)`;
+        if (handM) handM.style.transform = `rotate(${minAngle}deg)`;
+      }
 
       function render() {
-        document.getElementById("la").textContent = formatTime("America/Los_Angeles");
-        document.getElementById("in").textContent = formatTime("Asia/Kolkata");
-        document.getElementById("db").textContent = formatTime("Europe/Dublin");
+        renderOne("la", ZONES.la);
+        renderOne("in", ZONES.in);
+        renderOne("db", ZONES.db);
       }
 
       render();
