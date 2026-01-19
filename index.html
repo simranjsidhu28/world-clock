@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>World Clock</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; padding: 24px; }
+      .grid { display: grid; gap: 12px; max-width: 520px; }
+      .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; }
+      .label { color: #555; font-size: 14px; }
+      .time { font-size: 28px; font-weight: 650; margin-top: 6px; }
+    </style>
+  </head>
+  <body>
+    <h1>World Clock</h1>
+    <div class="grid">
+      <div class="card">
+        <div class="label">Pacific (Los Angeles)</div>
+        <div class="time" id="la"></div>
+      </div>
+      <div class="card">
+        <div class="label">India (Kolkata)</div>
+        <div class="time" id="in"></div>
+      </div>
+      <div class="card">
+        <div class="label">Dublin, Ireland</div>
+        <div class="time" id="db"></div>
+      </div>
+    </div>
+
+    <script>
+      const formatTime = (timeZone) =>
+        new Intl.DateTimeFormat(undefined, {
+          timeZone,
+          weekday: "short",
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+          timeZoneName: "short",
+        }).format(new Date());
+
+      function render() {
+        document.getElementById("la").textContent = formatTime("America/Los_Angeles");
+        document.getElementById("in").textContent = formatTime("Asia/Kolkata");
+        document.getElementById("db").textContent = formatTime("Europe/Dublin");
+      }
+
+      render();
+      setInterval(render, 1000);
+    </script>
+  </body>
+</html>
